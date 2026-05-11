@@ -1,0 +1,315 @@
+<!--
+git add .
+git commit -m "Descripción de cambios"
+git push
+-->
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Ventas — Métricas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .fab-nav {
+      background: var(--surface);
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 20px var(--accent-dim), 0 4px 20px var(--shadow);
+    }
+    .fab-nav:hover {
+      background: var(--accent-dim);
+      box-shadow: 0 0 40px var(--accent-dim), 0 8px 30px var(--shadow);
+    }
+    .page-indicator { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+    .fab-container  { display: flex; gap: 0.75rem; align-items: center; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <span class="logo">▸ VENTAS_OS</span>
+      <span class="badge">PÁG 1/2</span>
+    </div>
+
+    <div class="header-controls">
+      <div class="ctrl-group">
+        <span class="ctrl-label">Auto</span>
+        <button class="toggle-btn" id="btn-auto" onclick="toggleAuto()" title="Auto-refresco">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </button>
+      </div>
+
+      <select class="ctrl-select" id="select-intervalo" title="Intervalo">
+        <option value="3000">3s</option>
+        <option value="5000" selected>5s</option>
+        <option value="10000">10s</option>
+      </select>
+
+      <div class="ctrl-separator"></div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">Color</span>
+        <button class="icon-btn" onclick="toggleColorPicker()" title="Color del tema" id="btn-color">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/>
+          </svg>
+          <span>Color</span>
+        </button>
+      </div>
+
+      <div class="color-panel" id="color-panel">
+        <div class="color-panel-title">Gama de color</div>
+        <div class="color-swatches">
+          <button class="swatch active" data-color="#00ff99" data-dim="#00ff9933" style="background:#00ff99" title="Verde neón" onclick="aplicarColor('#00ff99','#00ff9933',this)"></button>
+          <button class="swatch" data-color="#00ccff" data-dim="#00ccff33" style="background:#00ccff" title="Cian" onclick="aplicarColor('#00ccff','#00ccff33',this)"></button>
+          <button class="swatch" data-color="#ff4488" data-dim="#ff448833" style="background:#ff4488" title="Rosa" onclick="aplicarColor('#ff4488','#ff448833',this)"></button>
+          <button class="swatch" data-color="#ffcc00" data-dim="#ffcc0033" style="background:#ffcc00" title="Amarillo" onclick="aplicarColor('#ffcc00','#ffcc0033',this)"></button>
+          <button class="swatch" data-color="#aa88ff" data-dim="#aa88ff33" style="background:#aa88ff" title="Violeta" onclick="aplicarColor('#aa88ff','#aa88ff33',this)"></button>
+          <button class="swatch" data-color="#ff8844" data-dim="#ff884433" style="background:#ff8844" title="Naranja" onclick="aplicarColor('#ff8844','#ff884433',this)"></button>
+          <button class="swatch" data-color="#44ffdd" data-dim="#44ffdd33" style="background:#44ffdd" title="Turquesa" onclick="aplicarColor('#44ffdd','#44ffdd33',this)"></button>
+          <button class="swatch" data-color="#ff6666" data-dim="#ff666633" style="background:#ff6666" title="Rojo" onclick="aplicarColor('#ff6666','#ff666633',this)"></button>
+        </div>
+        <div class="color-custom-row">
+          <label class="filter-label">Personalizado</label>
+          <input type="color" id="custom-color" value="#00ff99" class="color-input-native" oninput="aplicarColorPersonalizado(this.value)" />
+        </div>
+        <div class="color-panel-preview">
+          <span class="preview-dot" id="preview-dot"></span>
+          <span class="preview-hex" id="preview-hex">#00ff99</span>
+        </div>
+      </div>
+
+      <button class="icon-btn" onclick="exportarCSV()" title="Exportar CSV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>CSV</span>
+      </button>
+
+      <button class="icon-btn theme-btn" id="btn-theme" onclick="toggleTheme()" title="Cambiar tema">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="user-panel">
+      <button class="user-btn" onclick="toggleUserMenu()">
+        <div class="user-avatar">AM</div>
+        <div class="user-meta">
+          <span class="user-name">Admin</span>
+          <span class="user-role">Héctor ZR</span>
+        </div>
+        <svg class="user-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="user-dropdown" id="user-dropdown">
+        <div class="dropdown-header">
+          <div class="dropdown-avatar">AM</div>
+          <div class="dropdown-user-info">
+            <span class="dropdown-name">HectorzataraiN</span>
+            <span class="dropdown-email">admin@ventas-os.ai</span>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item"><span>🛡</span><span>Permisos: Root Access</span></div>
+        <div class="dropdown-item"><span>📊</span><span>Analytics Enabled</span></div>
+        <div class="dropdown-item"><span>🤖</span><span>AI Forecast Active</span></div>
+        <div class="dropdown-item"><span>🟢</span><span>Sistema Operativo</span></div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <span class="status-dot" id="status-dot"></span>
+      <span class="status-text" id="status-text">Sistema activo</span>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label class="filter-label">Período</label>
+      <div class="btn-group" id="grupo-periodo">
+        <button class="grp-btn"        data-dias="7"  onclick="setPeriodo(7)">7d</button>
+        <button class="grp-btn active" data-dias="14" onclick="setPeriodo(14)">14d</button>
+        <button class="grp-btn"        data-dias="30" onclick="setPeriodo(30)">30d</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Categoría</label>
+      <select class="ctrl-select" id="select-categoria" onchange="estado.categoria=this.value; generarDatos()">
+        <option value="todos">Todos</option>
+        <option value="hardware">Hardware</option>
+        <option value="perifericos">Periféricos</option>
+        <option value="mobiliario">Mobiliario</option>
+      </select>
+    </div>
+    <div class="filter-group range-group">
+      <label class="filter-label">
+        Precio mín. <span id="label-precio" class="accent-text">$299</span>
+      </label>
+      <input type="range" class="range-input" id="range-precio"
+        min="299" max="10000" step="100" value="299"
+        oninput="actualizarLabelPrecio(this.value)" />
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Ordenar</label>
+      <div class="btn-group">
+        <button class="grp-btn active" id="sort-fecha" onclick="setOrden('fecha')">Fecha</button>
+        <button class="grp-btn"        id="sort-total" onclick="setOrden('total')">Total ↓</button>
+      </div>
+    </div>
+    <div class="page-indicator">
+      <div class="filter-group">
+        <label class="filter-label">Vista</label>
+        <div class="btn-group">
+          <button class="grp-btn active">📊 Métricas</button>
+          <button class="grp-btn" onclick="window.location.href='analytics.html'">📡 Analytics</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main">
+
+    <section class="kpi-grid">
+      <div class="kpi-card" id="kpi-total">
+        <span class="kpi-label">Ventas Totales</span>
+        <span class="kpi-value" id="val-total">—</span>
+        <span class="kpi-unit">MXN</span>
+      </div>
+      <div class="kpi-card" id="kpi-promedio">
+        <span class="kpi-label">Promedio Diario</span>
+        <span class="kpi-value" id="val-promedio">—</span>
+        <span class="kpi-unit">MXN / día</span>
+      </div>
+      <div class="kpi-card" id="kpi-max">
+        <span class="kpi-label">Mejor Día</span>
+        <span class="kpi-value" id="val-max">—</span>
+        <span class="kpi-unit">MXN</span>
+      </div>
+      <div class="kpi-card" id="kpi-trans">
+        <span class="kpi-label">Transacciones</span>
+        <span class="kpi-value" id="val-trans">—</span>
+        <span class="kpi-unit">ops</span>
+      </div>
+    </section>
+
+    <div class="charts-row two-col">
+      <section class="chart-section">
+        <div class="section-header">
+          <h2 class="section-title">Ventas por Día</h2>
+          <span class="period-label" id="period-label">Sin datos</span>
+        </div>
+        <div class="chart-wrapper">
+          <div class="chart-bars" id="chart-bars">
+            <div class="chart-placeholder"><span>Genera datos para ver el gráfico</span></div>
+          </div>
+          <div class="chart-y-axis" id="chart-y-axis"></div>
+        </div>
+      </section>
+
+      <section class="chart-section">
+        <div class="section-header">
+          <h2 class="section-title">Tendencia Acumulada</h2>
+          <span class="period-label" id="area-label">Sin datos</span>
+        </div>
+        <div class="chart-wrapper">
+          <svg class="area-svg" id="area-svg" viewBox="0 0 400 160" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stop-color="var(--accent)" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.02"/>
+              </linearGradient>
+            </defs>
+            <text x="200" y="88" text-anchor="middle" fill="var(--muted)" font-size="12" font-family="Space Mono">Genera datos para ver</text>
+          </svg>
+        </div>
+      </section>
+    </div>
+
+    <div class="charts-row three-col">
+      <section class="chart-section donut-section">
+        <div class="section-header">
+          <h2 class="section-title">Por Categoría</h2>
+        </div>
+        <div class="donut-wrapper">
+          <svg class="donut-svg" id="donut-svg" viewBox="0 0 200 200">
+            <text x="100" y="108" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="Space Mono">Sin datos</text>
+          </svg>
+          <div class="donut-legend" id="donut-legend"></div>
+        </div>
+      </section>
+
+      <section class="chart-section">
+        <div class="section-header">
+          <h2 class="section-title">Top Productos</h2>
+        </div>
+        <div class="hbar-wrapper" id="hbar-wrapper">
+          <div class="chart-placeholder"><span>Genera datos para ver</span></div>
+        </div>
+      </section>
+
+      <section class="chart-section gauge-section">
+        <div class="section-header">
+          <h2 class="section-title">Rendimiento</h2>
+        </div>
+        <div class="gauge-wrapper">
+          <svg class="gauge-svg" id="gauge-svg" viewBox="0 0 200 130">
+            <path d="M20,110 A90,90 0 0,1 180,110" fill="none" stroke="var(--border)" stroke-width="16" stroke-linecap="round"/>
+            <path class="gauge-arc" id="gauge-arc"
+              d="M20,110 A90,90 0 0,1 180,110"
+              fill="none" stroke="var(--accent)" stroke-width="16" stroke-linecap="round"
+              stroke-dasharray="283" stroke-dashoffset="283"/>
+            <line id="gauge-needle" x1="100" y1="110" x2="100" y2="28"
+              stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"
+              transform="rotate(0, 100, 110)"/>
+            <circle cx="100" cy="110" r="5" fill="var(--accent)"/>
+            <text x="16"  y="128" fill="var(--muted)" font-size="9" font-family="Space Mono">0%</text>
+            <text x="170" y="128" fill="var(--muted)" font-size="9" font-family="Space Mono">100%</text>
+            <text x="100" y="97" text-anchor="middle" fill="var(--muted)" font-size="8" font-family="Space Mono" id="gauge-pct-label">—</text>
+          </svg>
+          <div class="gauge-value-box">
+            <span class="gauge-big" id="gauge-big">—</span>
+            <span class="gauge-sub" id="gauge-sub">vs meta $500k/día</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <div class="fab-container">
+    <button class="fab-btn" id="btn-generar" onclick="generarDatos()">
+      <svg class="fab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="23 4 23 10 17 10"/>
+        <polyline points="1 20 1 14 7 14"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+      </svg>
+      Generar Datos
+    </button>
+    <button class="fab-btn fab-nav" onclick="window.location.href='analytics.html'" title="Ir a Analytics">
+      <svg class="fab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+      Analytics →
+    </button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
